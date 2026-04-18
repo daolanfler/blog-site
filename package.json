@@ -1,5 +1,5 @@
 {
-  "name": "daolanfler.blog",
+  "name": "daolanfler-pages",
   "type": "module",
   "version": "0.0.1",
   "private": true,
@@ -19,7 +19,6 @@
     "@astrojs/rss": "^4.0.18",
     "@astrojs/sitemap": "^3.7.2",
     "@astrojs/solid-js": "^6.0.1",
-    "@astrojs/vercel": "^10.0.4",
     "@radix-ui/react-slot": "^1.2.4",
     "@stackblitz/sdk": "^1.11.0",
     "@types/html-escaper": "^3.0.4",

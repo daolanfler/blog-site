@@ -4,7 +4,6 @@ import mdx from "@astrojs/mdx";
 import tailwindcss from "@tailwindcss/vite";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeSlug from "rehype-slug";
-import vercel from "@astrojs/vercel";
 import { autolinkConfig } from "./plugins/rehype-autolink-config";
 import sitemap from "@astrojs/sitemap";
 
@@ -30,11 +29,10 @@ export default defineConfig({
     }),
     sitemap(),
   ],
-  adapter: vercel(),
   markdown: {
     rehypePlugins: [rehypeSlug, [rehypeAutolinkHeadings, autolinkConfig]],
   },
-  site: "https://daolanfler.blog",
+  site: "https://daolanfler.pages.dev",
   vite: {
     plugins: [tailwindcss()],
   },
