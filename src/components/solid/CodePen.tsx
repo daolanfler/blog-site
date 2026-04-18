@@ -1,6 +1,6 @@
 /** @jsxImportSource solid-js */
 
-import { onMount, createEffect, createSignal } from "solid-js";
+import { onMount } from "solid-js";
 
 interface Props {
   userName?: string;

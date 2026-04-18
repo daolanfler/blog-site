@@ -16,7 +16,7 @@ export async function GET(context: APIContext) {
         title: post.data.title,
         pubDate: post.data.date,
         description: (post.data.tags || []).join(", "),
-        link: `/posts/${post.slug}/`,
+        link: `/posts/${post.id}/`,
       })),
 
     customData: `<language>zh-cn</language>`,

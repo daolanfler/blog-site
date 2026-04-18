@@ -1,8 +1,7 @@
 ---
 /** ------------- SSG start -------------- */
 
-import type { CollectionEntry } from "astro:content";
-import { getCollection } from "astro:content";
+import { getCollection, render, type CollectionEntry } from "astro:content";
 import PostLayout from "../../layouts/PostLayout.astro";
 import { format } from "date-fns";
 import ReadingTime from "@/components/ReadingTime.astro";
@@ -11,14 +10,14 @@ import ReadingTime from "@/components/ReadingTime.astro";
 export async function getStaticPaths() {
   const blogEntries = await getCollection("blog");
   return blogEntries.map((entry) => ({
-    params: { slug: entry.slug },
+    params: { slug: entry.id },
     props: { entry },
   }));
 }
 
 // 2. When it's time to render, you can get the entry directly from the prop
 const { entry } = Astro.props as { entry: CollectionEntry<"blog"> };
-const { Content } = await entry.render();
+const { Content } = await render(entry);
 
 /** ------------- SSG end -------------- */
 
@@ -32,16 +31,16 @@ const { Content } = await entry.render();
 // // 1. Get the slug from the incoming server request
 // const { slug } = Astro.params;
 // if (slug === undefined) {
-//   throw new Error("Slug is required");
+//   throw new Error('Slug is required');
 // }
 // // 2. Query for the entry directly using the request slug
-// const entry = await getEntry("blog", slug);
+// const entry = await getEntry('blog', slug);
 // // 3. Redirect if the entry does not exist
 // if (entry === undefined) {
-//   return Astro.redirect("/404");
+//   return Astro.redirect('/404');
 // }
 // // 4. (Optional) Render the entry to HTML in the template
-// const { Content } = await entry.render();
+// const { Content } = await render(entry);
 
 /** ------------- Server rendering end -------------- */
 ---
@@ -51,7 +50,7 @@ const { Content } = await entry.render();
   <div class="gap-x-2 flex items-center mb-4 text-left text-gray-500">
     <time>{format(entry.data.date, "MMM d, yyyy")}</time>
     <span>·</span>
-    <ReadingTime content={entry.body} />
+    <ReadingTime content={entry.body ?? ""} />
   </div>
   <Content />
 </PostLayout>

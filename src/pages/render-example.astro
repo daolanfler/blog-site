@@ -1,22 +1,25 @@
 ---
-import { getEntry } from "astro:content";
+import { getEntry, render } from "astro:content";
 import PostLayout from "../layouts/PostLayout.astro";
 
-const post1 = await getEntry("blog", "a-bite-of-cookie")!;
+const post1 = await getEntry("blog", "a-bite-of-cookie");
+if (!post1) {
+  throw new Error("Post not found: a-bite-of-cookie");
+}
 
-const { Content, headings } = await post1.render();
+const { Content, headings } = await render(post1);
 ---
 
 <PostLayout>
-    <br />
-    headings: 
-    <ul>
-        {
-            headings.map((v) => {
-                return <li>{v.slug}</li>;
-            })
-        }
-    </ul>
-    <br />
-    <Content />
+  <br />
+  headings:
+  <ul>
+    {
+      headings.map((v: { slug: string }) => {
+        return <li>{v.slug}</li>;
+      })
+    }
+  </ul>
+  <br />
+  <Content />
 </PostLayout>
