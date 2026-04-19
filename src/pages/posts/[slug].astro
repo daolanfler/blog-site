@@ -53,11 +53,13 @@ const tocHeadings = headings.filter(
   pageTitle={entry.data.pageTitle}
   tocHeadings={tocHeadings}
 >
-  <h1>{entry.data.title}</h1>
-  <div class="gap-x-2 flex items-center mb-4 text-left text-gray-500">
-    <time>{format(entry.data.date, "MMM d, yyyy")}</time>
-    <span>·</span>
-    <ReadingTime content={entry.body ?? ""} />
+  <div data-post-hero>
+    <h1>{entry.data.title}</h1>
+    <div class="gap-x-2 flex items-center mb-4 text-left text-gray-500">
+      <time>{format(entry.data.date, "MMM d, yyyy")}</time>
+      <span>·</span>
+      <ReadingTime content={entry.body ?? ""} />
+    </div>
   </div>
   <Content />
 </PostLayout>

@@ -233,6 +233,99 @@
     margin-bottom: 2em;
   }
 
+  .floating-post-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 30;
+    width: 100%;
+    pointer-events: none;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-0.65rem);
+    transition:
+      visibility 0ms linear 240ms,
+      opacity 240ms ease-out,
+      transform 240ms ease-out;
+  }
+
+  .floating-post-header.is-visible {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0ms;
+  }
+
+  .floating-post-header > div {
+    min-height: 4rem;
+    border-bottom: 1px solid hsl(var(--border));
+    background: color-mix(in srgb, hsl(var(--background)) 94%, transparent);
+    backdrop-filter: blur(12px);
+    pointer-events: none;
+  }
+
+  .floating-post-header__title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .back-to-top-button {
+    position: fixed;
+    left: max(1rem, calc(50% - 25rem));
+    bottom: 1rem;
+    z-index: 30;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border: 1px solid hsl(var(--border));
+    border-radius: 999px;
+    background: color-mix(in srgb, hsl(var(--background)) 94%, transparent);
+    backdrop-filter: blur(12px);
+    font-size: 1.35rem;
+    color: hsl(var(--foreground));
+    line-height: 1;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(0.5rem);
+    cursor: pointer;
+    transition:
+      background-color 180ms ease-out,
+      border-color 180ms ease-out,
+      color 180ms ease-out,
+      box-shadow 180ms ease-out,
+      opacity 180ms ease-out,
+      transform 180ms ease-out;
+  }
+
+  .back-to-top-button.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .back-to-top-button:hover {
+    border-color: color-mix(in srgb, hsl(var(--foreground)) 16%, hsl(var(--border)));
+    background: color-mix(in srgb, hsl(var(--accent)) 72%, transparent);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+  }
+
+  .back-to-top-button:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 3px;
+    border-color: hsl(var(--ring));
+  }
+
+  .back-to-top-button:active {
+    transform: translateY(0.1rem) scale(0.96);
+  }
+
   .toc-mobile summary::-webkit-details-marker {
     display: none;
   }

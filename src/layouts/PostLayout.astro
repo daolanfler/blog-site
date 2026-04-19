@@ -23,6 +23,26 @@ const hasToc = tocHeadings.length > 0;
 ---
 
 <BaseLayout pageTitle={pageTitle || title}>
+  <div
+    class="floating-post-header"
+    data-floating-post-header
+    aria-hidden="true"
+  >
+    <div class="mx-auto flex max-w-2xl items-center px-4">
+      <p class="floating-post-header__title">{title}</p>
+    </div>
+  </div>
+  <button
+    type="button"
+    class="back-to-top-button"
+    data-back-to-top
+    aria-hidden="true"
+    aria-label="Back to top"
+    title="Back to top"
+  >
+    ↑
+  </button>
+
   <div class="mx-auto max-w-2xl px-4">
     {hasToc && <TableOfContents headings={tocHeadings} variant="mobile" />}
     <div class="relative">
@@ -34,9 +54,45 @@ const hasToc = tocHeadings.length > 0;
   </div>
 
   {
-    hasToc && (
+    (
       <script is:inline>
-        const initTableOfContents = () => {
+        const initPostLayoutEnhancements = () => {
+          const floatingHeader = document.querySelector("[data-floating-post-header]");
+          const backToTopButton = document.querySelector("[data-back-to-top]");
+          const postHero = document.querySelector("[data-post-hero]");
+          const shouldTrackFloatingHeader =
+            floatingHeader && backToTopButton && postHero;
+
+          if (shouldTrackFloatingHeader) {
+            const setFloatingChromeVisible = (isVisible) => {
+              floatingHeader.classList.toggle("is-visible", isVisible);
+              floatingHeader.setAttribute("aria-hidden", isVisible ? "false" : "true");
+              backToTopButton.classList.toggle("is-visible", isVisible);
+              backToTopButton.setAttribute("aria-hidden", isVisible ? "false" : "true");
+            };
+
+            const floatingHeaderObserver = new IntersectionObserver(
+              ([entry]) => {
+                const headerOffset = 72;
+                const shouldShowFloatingChrome =
+                  entry.boundingClientRect.bottom <= headerOffset;
+
+                setFloatingChromeVisible(shouldShowFloatingChrome);
+              },
+              {
+                rootMargin: "0px 0px 0px 0px",
+                threshold: [0, 1],
+              },
+            );
+
+            floatingHeaderObserver.observe(postHero);
+            backToTopButton.addEventListener("click", () => {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+          }
+
+          if (!document.querySelector("[data-toc-link]")) return;
+
           const headingElements = Array.from(
             document.querySelectorAll("[data-post-content] :is(h2[id], h3[id])"),
           );
@@ -151,11 +207,11 @@ const hasToc = tocHeadings.length > 0;
         };
 
         if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", initTableOfContents, {
+          document.addEventListener("DOMContentLoaded", initPostLayoutEnhancements, {
             once: true,
           });
         } else {
-          initTableOfContents();
+          initPostLayoutEnhancements();
         }
       </script>
     )
