@@ -32,7 +32,7 @@ export default defineConfig({
   markdown: {
     rehypePlugins: [rehypeSlug, [rehypeAutolinkHeadings, autolinkConfig]],
   },
-  site: "https://daolanfler.pages.dev",
+  site: "https://blog.daolanfler.workers.dev",
   vite: {
     plugins: [tailwindcss()],
   },

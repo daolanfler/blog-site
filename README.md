@@ -1,10 +1,10 @@
-<https://daolanfler.pages.dev>
+<https://blog.daolanfler.workers.dev>
 
 ## Deploy
 
-This site is deployed as a static Astro site on Cloudflare Pages.
+This site is deployed as a static Astro site on Cloudflare Workers.
 
-- Production URL: `https://daolanfler.pages.dev`
+- Production URL: `https://blog.daolanfler.workers.dev`
 - Build command: `pnpm build`
 - Build output directory: `dist`
 - Deploy command: `npx wrangler@latest deploy`
