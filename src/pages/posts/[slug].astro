@@ -17,7 +17,10 @@ export async function getStaticPaths() {
 
 // 2. When it's time to render, you can get the entry directly from the prop
 const { entry } = Astro.props as { entry: CollectionEntry<"blog"> };
-const { Content } = await render(entry);
+const { Content, headings } = await render(entry);
+const tocHeadings = headings.filter(
+  (heading) => heading.depth === 2 || heading.depth === 3,
+);
 
 /** ------------- SSG end -------------- */
 
@@ -45,7 +48,11 @@ const { Content } = await render(entry);
 /** ------------- Server rendering end -------------- */
 ---
 
-<PostLayout postTitle={entry.data.title} pageTitle={entry.data.pageTitle}>
+<PostLayout
+  postTitle={entry.data.title}
+  pageTitle={entry.data.pageTitle}
+  tocHeadings={tocHeadings}
+>
   <h1>{entry.data.title}</h1>
   <div class="gap-x-2 flex items-center mb-4 text-left text-gray-500">
     <time>{format(entry.data.date, "MMM d, yyyy")}</time>

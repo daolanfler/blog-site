@@ -1,0 +1,84 @@
+---
+type TocHeading = {
+  depth: number;
+  slug: string;
+  text: string;
+};
+
+type Props = {
+  headings: TocHeading[];
+  variant?: "mobile" | "desktop";
+};
+
+const { headings, variant = "desktop" } = Astro.props;
+---
+
+{
+  variant === "mobile" ? (
+    <details class="toc-mobile mb-6 rounded-xl border bg-background/95 lg:hidden">
+      <summary class="cursor-pointer list-none px-4 py-3 font-medium">
+        <span class="flex items-center justify-between gap-4">
+          <span>On this page</span>
+          <span class="text-xs uppercase tracking-[0.2em] text-gray-500">
+            H2 / H3
+          </span>
+        </span>
+      </summary>
+      <nav
+        aria-label="Table of contents"
+        class="border-t px-3 py-3"
+        data-toc-nav
+      >
+        <ol class="space-y-1">
+          {
+            headings.map((heading) => (
+              <li>
+                <a
+                  href={`#${heading.slug}`}
+                  data-toc-link={heading.slug}
+                  class:list={[
+                    "toc-link block rounded-md px-3 py-2 text-sm text-gray-600 transition-colors hover:text-foreground dark:text-gray-300",
+                    heading.depth === 3 && "pl-6 text-[0.95rem]",
+                  ]}
+                >
+                  {heading.text}
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+    </details>
+  ) : (
+    <aside class="toc-desktop-panel">
+      <div class="rounded-2xl border bg-background/80 p-4 backdrop-blur">
+        <div class="mb-3 flex items-center justify-between gap-3">
+          <h2 class="text-sm font-semibold uppercase tracking-[0.2em] text-gray-500">
+            On this page
+          </h2>
+          <span class="text-xs text-gray-400">H2 / H3</span>
+        </div>
+        <nav aria-label="Table of contents" data-toc-nav>
+          <ol class="space-y-1">
+            {
+              headings.map((heading) => (
+                <li>
+                  <a
+                    href={`#${heading.slug}`}
+                    data-toc-link={heading.slug}
+                    class:list={[
+                      "toc-link block rounded-md px-3 py-2 text-sm text-gray-600 transition-colors hover:text-foreground dark:text-gray-300",
+                      heading.depth === 3 && "pl-6 text-[0.95rem]",
+                    ]}
+                  >
+                    {heading.text}
+                  </a>
+                </li>
+              ))
+            }
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  )
+}

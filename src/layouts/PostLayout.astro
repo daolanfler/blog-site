@@ -1,21 +1,163 @@
 ---
 import type { MarkdownLayoutProps } from "astro"; // 此文件可用作 markdown layout
 import BaseLayout from "./BaseLayout.astro";
+import TableOfContents from "../components/TableOfContents.astro";
 
 type Props = Partial<
   MarkdownLayoutProps<{ pageTitle?: string; title: string }>
 > & {
   postTitle?: string;
   pageTitle?: string;
+  tocHeadings?: { depth: number; slug: string; text: string }[];
 };
 
-const { frontmatter, postTitle, pageTitle: _pageTitle } = Astro.props;
+const {
+  frontmatter,
+  postTitle,
+  pageTitle: _pageTitle,
+  tocHeadings = [],
+} = Astro.props;
 const pageTitle = frontmatter?.pageTitle || _pageTitle;
 const title = frontmatter?.title || postTitle;
+const hasToc = tocHeadings.length > 0;
 ---
 
 <BaseLayout pageTitle={pageTitle || title}>
-  <article class="max-w-2xl px-4 m-auto prose">
-    <slot />
-  </article>
+  <div class="mx-auto max-w-2xl px-4">
+    {hasToc && <TableOfContents headings={tocHeadings} variant="mobile" />}
+    <div class="relative">
+      <article class="prose m-auto max-w-2xl" data-post-content>
+        <slot />
+      </article>
+      {hasToc && <TableOfContents headings={tocHeadings} variant="desktop" />}
+    </div>
+  </div>
+
+  {
+    hasToc && (
+      <script is:inline>
+        const initTableOfContents = () => {
+          const headingElements = Array.from(
+            document.querySelectorAll("[data-post-content] :is(h2[id], h3[id])"),
+          );
+          const tocLinks = Array.from(document.querySelectorAll("[data-toc-link]"));
+
+          if (!headingElements.length || !tocLinks.length) return;
+
+          const setActiveHeading = (activeId) => {
+            tocLinks.forEach((link) => {
+              const isActive = link.dataset.tocLink === activeId;
+              link.classList.toggle("current-header-link", isActive);
+              if (isActive) {
+                link.setAttribute("aria-current", "true");
+              } else {
+                link.removeAttribute("aria-current");
+              }
+            });
+          };
+
+          const getHashHeadingId = () => {
+            const hash = window.location.hash.slice(1);
+            return hash ? decodeURIComponent(hash) : "";
+          };
+
+          // Prefer an explicitly selected hash target once the browser has
+          // settled on it, then fall back to the last heading at page bottom,
+          // and otherwise use the last heading that has crossed the top offset.
+          const findActiveHeading = () => {
+            const hashHeadingId = getHashHeadingId();
+            if (hashHeadingId) {
+              const hashHeading = headingElements.find(
+                (heading) => heading.id === hashHeadingId,
+              );
+
+              if (hashHeading) {
+                const hashHeadingRect = hashHeading.getBoundingClientRect();
+                const anchorSettled =
+                  hashHeadingRect.top <= 180 ||
+                  window.innerHeight + window.scrollY >=
+                    document.documentElement.scrollHeight - 4;
+
+                if (anchorSettled) {
+                  return hashHeading;
+                }
+              }
+            }
+
+            const reachedPageBottom =
+              window.innerHeight + window.scrollY >=
+              document.documentElement.scrollHeight - 4;
+
+            if (reachedPageBottom) {
+              return headingElements[headingElements.length - 1];
+            }
+
+            const topOffset = 140;
+            const headingAboveTop = headingElements.filter(
+              (heading) => heading.getBoundingClientRect().top <= topOffset,
+            );
+
+            if (headingAboveTop.length > 0) {
+              return headingAboveTop[headingAboveTop.length - 1];
+            }
+
+            return headingElements[0];
+          };
+
+          let ticking = false;
+          const syncActiveHeading = () => {
+            if (ticking) return;
+            ticking = true;
+
+            window.requestAnimationFrame(() => {
+              const activeHeading = findActiveHeading();
+              if (activeHeading?.id) {
+                setActiveHeading(activeHeading.id);
+              }
+              ticking = false;
+            });
+          };
+
+          tocLinks.forEach((link) => {
+            link.addEventListener("click", () => {
+              const clickedId = link.dataset.tocLink;
+              if (!clickedId) return;
+
+              setActiveHeading(clickedId);
+              window.requestAnimationFrame(() => {
+                window.setTimeout(syncActiveHeading, 0);
+              });
+            });
+          });
+
+          const observer = new IntersectionObserver(syncActiveHeading, {
+            rootMargin: "-96px 0px -55% 0px",
+            threshold: [0, 1],
+          });
+
+          headingElements.forEach((heading) => observer.observe(heading));
+          document.addEventListener("scroll", syncActiveHeading, { passive: true });
+          window.addEventListener("resize", syncActiveHeading);
+          window.addEventListener("hashchange", () => {
+            const hashHeadingId = getHashHeadingId();
+            if (hashHeadingId) {
+              setActiveHeading(hashHeadingId);
+            }
+            window.requestAnimationFrame(syncActiveHeading);
+          });
+
+          setActiveHeading(headingElements[0].id);
+          syncActiveHeading();
+        };
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", initTableOfContents, {
+            once: true,
+          });
+        } else {
+          initTableOfContents();
+        }
+      </script>
+    )
+  }
 </BaseLayout>
